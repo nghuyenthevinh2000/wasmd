@@ -1,12 +1,11 @@
 package keeper
 
 import (
+	"github.com/CosmWasm/wasmd/x/wasm/types"
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
-
-	"github.com/CosmWasm/wasmd/x/wasm/types"
 )
 
 const (
@@ -164,7 +163,7 @@ func (g WasmGasRegister) ReplyCosts(pinned bool, reply wasmvmtypes.Reply) sdk.Ga
 		var attrs []wasmvmtypes.EventAttribute
 		for _, e := range reply.Result.Ok.Events {
 			eventGas += sdk.Gas(len(e.Type)) * g.c.EventAttributeDataCost
-			attrs = append(attrs, e.Attributes...)
+			attrs = append(e.Attributes)
 		}
 		// apply free tier on the whole set not per event
 		eventGas += g.EventCosts(attrs, nil)

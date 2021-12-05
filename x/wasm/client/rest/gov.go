@@ -4,17 +4,16 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"github.com/CosmWasm/wasmd/x/wasm/types"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/rest"
 	govrest "github.com/cosmos/cosmos-sdk/x/gov/client/rest"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-
-	"github.com/CosmWasm/wasmd/x/wasm/types"
 )
 
-type StoreCodeProposalJSONReq struct {
+type StoreCodeProposalJsonReq struct {
 	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"`
 
 	Title       string    `json:"title" yaml:"title"`
@@ -29,7 +28,7 @@ type StoreCodeProposalJSONReq struct {
 	InstantiatePermission *types.AccessConfig `json:"instantiate_permission" yaml:"instantiate_permission"`
 }
 
-func (s StoreCodeProposalJSONReq) Content() govtypes.Content {
+func (s StoreCodeProposalJsonReq) Content() govtypes.Content {
 	return &types.StoreCodeProposal{
 		Title:                 s.Title,
 		Description:           s.Description,
@@ -38,13 +37,13 @@ func (s StoreCodeProposalJSONReq) Content() govtypes.Content {
 		InstantiatePermission: s.InstantiatePermission,
 	}
 }
-func (s StoreCodeProposalJSONReq) GetProposer() string {
+func (s StoreCodeProposalJsonReq) GetProposer() string {
 	return s.Proposer
 }
-func (s StoreCodeProposalJSONReq) GetDeposit() sdk.Coins {
+func (s StoreCodeProposalJsonReq) GetDeposit() sdk.Coins {
 	return s.Deposit
 }
-func (s StoreCodeProposalJSONReq) GetBaseReq() rest.BaseReq {
+func (s StoreCodeProposalJsonReq) GetBaseReq() rest.BaseReq {
 	return s.BaseReq
 }
 
@@ -52,7 +51,7 @@ func StoreCodeProposalHandler(cliCtx client.Context) govrest.ProposalRESTHandler
 	return govrest.ProposalRESTHandler{
 		SubRoute: "wasm_store_code",
 		Handler: func(w http.ResponseWriter, r *http.Request) {
-			var req StoreCodeProposalJSONReq
+			var req StoreCodeProposalJsonReq
 			if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 				return
 			}
@@ -61,7 +60,7 @@ func StoreCodeProposalHandler(cliCtx client.Context) govrest.ProposalRESTHandler
 	}
 }
 
-type InstantiateProposalJSONReq struct {
+type InstantiateProposalJsonReq struct {
 	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"`
 
 	Title       string `json:"title" yaml:"title"`
@@ -79,7 +78,7 @@ type InstantiateProposalJSONReq struct {
 	Funds sdk.Coins       `json:"funds" yaml:"funds"`
 }
 
-func (s InstantiateProposalJSONReq) Content() govtypes.Content {
+func (s InstantiateProposalJsonReq) Content() govtypes.Content {
 	return &types.InstantiateContractProposal{
 		Title:       s.Title,
 		Description: s.Description,
@@ -87,17 +86,17 @@ func (s InstantiateProposalJSONReq) Content() govtypes.Content {
 		Admin:       s.Admin,
 		CodeID:      s.Code,
 		Label:       s.Label,
-		Msg:         types.RawContractMessage(s.Msg),
+		Msg:         s.Msg,
 		Funds:       s.Funds,
 	}
 }
-func (s InstantiateProposalJSONReq) GetProposer() string {
+func (s InstantiateProposalJsonReq) GetProposer() string {
 	return s.Proposer
 }
-func (s InstantiateProposalJSONReq) GetDeposit() sdk.Coins {
+func (s InstantiateProposalJsonReq) GetDeposit() sdk.Coins {
 	return s.Deposit
 }
-func (s InstantiateProposalJSONReq) GetBaseReq() rest.BaseReq {
+func (s InstantiateProposalJsonReq) GetBaseReq() rest.BaseReq {
 	return s.BaseReq
 }
 
@@ -105,7 +104,7 @@ func InstantiateProposalHandler(cliCtx client.Context) govrest.ProposalRESTHandl
 	return govrest.ProposalRESTHandler{
 		SubRoute: "wasm_instantiate",
 		Handler: func(w http.ResponseWriter, r *http.Request) {
-			var req InstantiateProposalJSONReq
+			var req InstantiateProposalJsonReq
 			if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 				return
 			}
@@ -114,7 +113,7 @@ func InstantiateProposalHandler(cliCtx client.Context) govrest.ProposalRESTHandl
 	}
 }
 
-type MigrateProposalJSONReq struct {
+type MigrateProposalJsonReq struct {
 	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"`
 
 	Title       string `json:"title" yaml:"title"`
@@ -130,30 +129,30 @@ type MigrateProposalJSONReq struct {
 	RunAs string `json:"run_as" yaml:"run_as"`
 }
 
-func (s MigrateProposalJSONReq) Content() govtypes.Content {
+func (s MigrateProposalJsonReq) Content() govtypes.Content {
 	return &types.MigrateContractProposal{
 		Title:       s.Title,
 		Description: s.Description,
 		Contract:    s.Contract,
 		CodeID:      s.Code,
-		Msg:         types.RawContractMessage(s.Msg),
+		Msg:         s.Msg,
 		RunAs:       s.RunAs,
 	}
 }
-func (s MigrateProposalJSONReq) GetProposer() string {
+func (s MigrateProposalJsonReq) GetProposer() string {
 	return s.Proposer
 }
-func (s MigrateProposalJSONReq) GetDeposit() sdk.Coins {
+func (s MigrateProposalJsonReq) GetDeposit() sdk.Coins {
 	return s.Deposit
 }
-func (s MigrateProposalJSONReq) GetBaseReq() rest.BaseReq {
+func (s MigrateProposalJsonReq) GetBaseReq() rest.BaseReq {
 	return s.BaseReq
 }
 func MigrateProposalHandler(cliCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
 		SubRoute: "wasm_migrate",
 		Handler: func(w http.ResponseWriter, r *http.Request) {
-			var req MigrateProposalJSONReq
+			var req MigrateProposalJsonReq
 			if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 				return
 			}
@@ -162,7 +161,7 @@ func MigrateProposalHandler(cliCtx client.Context) govrest.ProposalRESTHandler {
 	}
 }
 
-type UpdateAdminJSONReq struct {
+type UpdateAdminJsonReq struct {
 	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"`
 
 	Title       string `json:"title" yaml:"title"`
@@ -175,7 +174,7 @@ type UpdateAdminJSONReq struct {
 	Contract string `json:"contract" yaml:"contract"`
 }
 
-func (s UpdateAdminJSONReq) Content() govtypes.Content {
+func (s UpdateAdminJsonReq) Content() govtypes.Content {
 	return &types.UpdateAdminProposal{
 		Title:       s.Title,
 		Description: s.Description,
@@ -183,20 +182,20 @@ func (s UpdateAdminJSONReq) Content() govtypes.Content {
 		NewAdmin:    s.NewAdmin,
 	}
 }
-func (s UpdateAdminJSONReq) GetProposer() string {
+func (s UpdateAdminJsonReq) GetProposer() string {
 	return s.Proposer
 }
-func (s UpdateAdminJSONReq) GetDeposit() sdk.Coins {
+func (s UpdateAdminJsonReq) GetDeposit() sdk.Coins {
 	return s.Deposit
 }
-func (s UpdateAdminJSONReq) GetBaseReq() rest.BaseReq {
+func (s UpdateAdminJsonReq) GetBaseReq() rest.BaseReq {
 	return s.BaseReq
 }
 func UpdateContractAdminProposalHandler(cliCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
 		SubRoute: "wasm_update_admin",
 		Handler: func(w http.ResponseWriter, r *http.Request) {
-			var req UpdateAdminJSONReq
+			var req UpdateAdminJsonReq
 			if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 				return
 			}
@@ -205,7 +204,7 @@ func UpdateContractAdminProposalHandler(cliCtx client.Context) govrest.ProposalR
 	}
 }
 
-type ClearAdminJSONReq struct {
+type ClearAdminJsonReq struct {
 	BaseReq rest.BaseReq `json:"base_req" yaml:"base_req"`
 
 	Title       string `json:"title" yaml:"title"`
@@ -217,27 +216,27 @@ type ClearAdminJSONReq struct {
 	Contract string `json:"contract" yaml:"contract"`
 }
 
-func (s ClearAdminJSONReq) Content() govtypes.Content {
+func (s ClearAdminJsonReq) Content() govtypes.Content {
 	return &types.ClearAdminProposal{
 		Title:       s.Title,
 		Description: s.Description,
 		Contract:    s.Contract,
 	}
 }
-func (s ClearAdminJSONReq) GetProposer() string {
+func (s ClearAdminJsonReq) GetProposer() string {
 	return s.Proposer
 }
-func (s ClearAdminJSONReq) GetDeposit() sdk.Coins {
+func (s ClearAdminJsonReq) GetDeposit() sdk.Coins {
 	return s.Deposit
 }
-func (s ClearAdminJSONReq) GetBaseReq() rest.BaseReq {
+func (s ClearAdminJsonReq) GetBaseReq() rest.BaseReq {
 	return s.BaseReq
 }
 func ClearContractAdminProposalHandler(cliCtx client.Context) govrest.ProposalRESTHandler {
 	return govrest.ProposalRESTHandler{
 		SubRoute: "wasm_clear_admin",
 		Handler: func(w http.ResponseWriter, r *http.Request) {
-			var req ClearAdminJSONReq
+			var req ClearAdminJsonReq
 			if !rest.ReadRESTReq(w, r, cliCtx.LegacyAmino, &req) {
 				return
 			}

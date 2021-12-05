@@ -91,7 +91,6 @@ func BenchmarkTxSending(b *testing.B) {
 	for name, tc := range cases {
 		b.Run(name, func(b *testing.B) {
 			db := tc.db(b)
-			defer db.Close()
 			appInfo := InitializeWasmApp(b, db, tc.numAccounts)
 			txs := tc.txBuilder(b, &appInfo)
 

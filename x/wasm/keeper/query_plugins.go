@@ -4,9 +4,8 @@ import (
 	"encoding/json"
 	"fmt"
 
-	channeltypes "github.com/cosmos/cosmos-sdk/x/ibc/core/04-channel/types"
-
 	"github.com/CosmWasm/wasmd/x/wasm/types"
+	channeltypes "github.com/cosmos/ibc-go/modules/core/04-channel/types"
 
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -288,7 +287,7 @@ func StakingQuerier(keeper types.StakingKeeper, distKeeper types.DistributionKee
 		}
 		if request.AllValidators != nil {
 			validators := keeper.GetBondedValidatorsByPower(ctx)
-			// validators := keeper.GetAllValidators(ctx)
+			//validators := keeper.GetAllValidators(ctx)
 			wasmVals := make([]wasmvmtypes.Validator, len(validators))
 			for i, v := range validators {
 				wasmVals[i] = wasmvmtypes.Validator{
@@ -469,11 +468,7 @@ func WasmQuerier(k wasmQueryKeeper) func(ctx sdk.Context, request *wasmvmtypes.W
 			if err != nil {
 				return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, request.Smart.ContractAddr)
 			}
-			msg := types.RawContractMessage(request.Smart.Msg)
-			if err := msg.ValidateBasic(); err != nil {
-				return nil, sdkerrors.Wrap(err, "json msg")
-			}
-			return k.QuerySmart(ctx, addr, msg)
+			return k.QuerySmart(ctx, addr, request.Smart.Msg)
 		case request.Raw != nil:
 			addr, err := sdk.AccAddressFromBech32(request.Raw.ContractAddr)
 			if err != nil {

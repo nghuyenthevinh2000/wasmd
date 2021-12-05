@@ -3,13 +3,11 @@ package wasmtesting
 import (
 	"bytes"
 	"crypto/sha256"
-
+	"github.com/CosmWasm/wasmd/x/wasm/types"
 	wasmvm "github.com/CosmWasm/wasmvm"
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/tendermint/tendermint/libs/rand"
-
-	"github.com/CosmWasm/wasmd/x/wasm/types"
 )
 
 var _ types.WasmerEngine = &MockWasmer{}
@@ -290,14 +288,14 @@ type contractExecutable interface {
 	) (*wasmvmtypes.Response, uint64, error)
 }
 
-// MakeInstantiable adds some noop functions to not fail when contract is used for instantiation
+//MakeInstantiable adds some noop functions to not fail when contract is used for instantiation
 func MakeInstantiable(m *MockWasmer) {
 	m.CreateFn = HashOnlyCreateFn
 	m.InstantiateFn = NoOpInstantiateFn
 	m.AnalyzeCodeFn = WithoutIBCAnalyzeFn
 }
 
-// MakeIBCInstantiable adds some noop functions to not fail when contract is used for instantiation
+//MakeIBCInstantiable adds some noop functions to not fail when contract is used for instantiation
 func MakeIBCInstantiable(m *MockWasmer) {
 	MakeInstantiable(m)
 	m.AnalyzeCodeFn = HasIBCAnalyzeFn

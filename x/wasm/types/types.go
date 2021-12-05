@@ -2,19 +2,18 @@ package types
 
 import (
 	"fmt"
-	"reflect"
-
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/gogo/protobuf/proto"
+	"reflect"
 )
 
 const (
-	defaultMemoryCacheSize    uint32 = 100 // in MiB
-	defaultSmartQueryGasLimit uint64 = 3_000_000
-	defaultContractDebugMode         = false
+	defaultMemoryCacheSize   uint32 = 100 // in MiB
+	defaultQueryGasLimit     uint64 = 3000000
+	defaultContractDebugMode        = false
 )
 
 func (m Model) ValidateBasic() error {
@@ -196,9 +195,9 @@ type ContractInfoExtension interface {
 var _ codectypes.UnpackInterfacesMessage = &ContractInfo{}
 
 // UnpackInterfaces implements codectypes.UnpackInterfaces
-func (c *ContractInfo) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
+func (m *ContractInfo) UnpackInterfaces(unpacker codectypes.AnyUnpacker) error {
 	var details ContractInfoExtension
-	if err := unpacker.UnpackAny(c.Extension, &details); err != nil {
+	if err := unpacker.UnpackAny(m.Extension, &details); err != nil {
 		return err
 	}
 	return codectypes.UnpackInterfaces(details, unpacker)
@@ -296,10 +295,6 @@ func NewWasmCoins(cosmosCoins sdk.Coins) (wasmCoins []wasmvmtypes.Coin) {
 
 // WasmConfig is the extra config required for wasm
 type WasmConfig struct {
-	// SimulationGasLimit is the max gas to be used in a tx simulation call.
-	// When not set the consensus max block gas is used instead
-	SimulationGasLimit *uint64
-	// SimulationGasLimit is the max gas to be used in a smart query contract call
 	SmartQueryGasLimit uint64
 	// MemoryCacheSize in MiB not bytes
 	MemoryCacheSize uint32
@@ -310,7 +305,7 @@ type WasmConfig struct {
 // DefaultWasmConfig returns the default settings for WasmConfig
 func DefaultWasmConfig() WasmConfig {
 	return WasmConfig{
-		SmartQueryGasLimit: defaultSmartQueryGasLimit,
+		SmartQueryGasLimit: defaultQueryGasLimit,
 		MemoryCacheSize:    defaultMemoryCacheSize,
 		ContractDebugMode:  defaultContractDebugMode,
 	}

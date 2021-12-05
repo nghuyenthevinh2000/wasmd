@@ -1,12 +1,11 @@
 package keeper
 
 import (
+	"github.com/CosmWasm/wasmd/x/wasm/types"
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
-
-	"github.com/CosmWasm/wasmd/x/wasm/types"
 )
 
 // Messenger is an extension point for custom wasmd message handling
@@ -126,7 +125,7 @@ func (d MessageDispatcher) DispatchSubmessages(ctx sdk.Context, contractAddr sdk
 			}
 			result = wasmvmtypes.SubcallResult{
 				Ok: &wasmvmtypes.SubcallResponse{
-					Events: sdkEventsToWasmVMEvents(filteredEvents),
+					Events: sdkEventsToWasmVmEvents(filteredEvents),
 					Data:   responseData,
 				},
 			}
@@ -166,18 +165,18 @@ func filterEvents(events []sdk.Event) []sdk.Event {
 	return res
 }
 
-func sdkEventsToWasmVMEvents(events []sdk.Event) []wasmvmtypes.Event {
+func sdkEventsToWasmVmEvents(events []sdk.Event) []wasmvmtypes.Event {
 	res := make([]wasmvmtypes.Event, len(events))
 	for i, ev := range events {
 		res[i] = wasmvmtypes.Event{
 			Type:       ev.Type,
-			Attributes: sdkAttributesToWasmVMAttributes(ev.Attributes),
+			Attributes: sdkAttributesToWasmVmAttributes(ev.Attributes),
 		}
 	}
 	return res
 }
 
-func sdkAttributesToWasmVMAttributes(attrs []abci.EventAttribute) []wasmvmtypes.EventAttribute {
+func sdkAttributesToWasmVmAttributes(attrs []abci.EventAttribute) []wasmvmtypes.EventAttribute {
 	res := make([]wasmvmtypes.EventAttribute, len(attrs))
 	for i, attr := range attrs {
 		res[i] = wasmvmtypes.EventAttribute{

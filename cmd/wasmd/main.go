@@ -3,9 +3,8 @@ package main
 import (
 	"os"
 
-	"github.com/cosmos/cosmos-sdk/server"
-
 	"github.com/CosmWasm/wasmd/app"
+	"github.com/cosmos/cosmos-sdk/server"
 )
 
 func main() {

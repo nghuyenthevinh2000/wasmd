@@ -2,13 +2,11 @@ package keeper
 
 import (
 	"context"
-	"testing"
-
+	"github.com/CosmWasm/wasmd/x/wasm/types"
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
-
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"testing"
 )
 
 func TestHasWasmModuleEvent(t *testing.T) {

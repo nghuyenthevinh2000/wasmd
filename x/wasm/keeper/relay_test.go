@@ -6,14 +6,13 @@ import (
 	"math"
 	"testing"
 
+	"github.com/CosmWasm/wasmd/x/wasm/keeper/wasmtesting"
+	"github.com/CosmWasm/wasmd/x/wasm/types"
 	wasmvm "github.com/CosmWasm/wasmvm"
 	wasmvmtypes "github.com/CosmWasm/wasmvm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
-
-	"github.com/CosmWasm/wasmd/x/wasm/keeper/wasmtesting"
-	"github.com/CosmWasm/wasmd/x/wasm/types"
 )
 
 func TestOnOpenChannel(t *testing.T) {
@@ -80,7 +79,7 @@ func TestOnOpenChannel(t *testing.T) {
 			}
 			require.NoError(t, err)
 			// verify gas consumed
-			const storageCosts = sdk.Gas(0xa9d)
+			const storageCosts = sdk.Gas(0xad9)
 			assert.Equal(t, spec.expGas, ctx.GasMeter().GasConsumed()-before-storageCosts)
 		})
 	}
@@ -185,7 +184,7 @@ func TestOnConnectChannel(t *testing.T) {
 			}
 			require.NoError(t, err)
 			// verify gas consumed
-			const storageCosts = sdk.Gas(0xa9d)
+			const storageCosts = sdk.Gas(0xad9)
 			assert.Equal(t, spec.expContractGas, ctx.GasMeter().GasConsumed()-before-storageCosts)
 			// verify msgs dispatched
 			require.Len(t, *capturedMsgs, len(spec.contractResp.Messages))
@@ -295,7 +294,7 @@ func TestOnCloseChannel(t *testing.T) {
 			}
 			require.NoError(t, err)
 			// verify gas consumed
-			const storageCosts = sdk.Gas(0xa9d)
+			const storageCosts = sdk.Gas(0xad9)
 			assert.Equal(t, spec.expContractGas, ctx.GasMeter().GasConsumed()-before-storageCosts)
 			// verify msgs dispatched
 			require.Len(t, *capturedMsgs, len(spec.contractResp.Messages))
@@ -456,7 +455,7 @@ func TestOnRecvPacket(t *testing.T) {
 			require.Equal(t, spec.expAck, gotAck)
 
 			// verify gas consumed
-			const storageCosts = sdk.Gas(0xa9d)
+			const storageCosts = sdk.Gas(0xad9)
 			assert.Equal(t, spec.expContractGas, ctx.GasMeter().GasConsumed()-before-storageCosts)
 			// verify msgs dispatched
 			require.Len(t, *capturedMsgs, len(spec.contractResp.Messages))
@@ -562,7 +561,7 @@ func TestOnAckPacket(t *testing.T) {
 			}
 			require.NoError(t, err)
 			// verify gas consumed
-			const storageCosts = sdk.Gas(0xa9d)
+			const storageCosts = sdk.Gas(0xad9)
 			assert.Equal(t, spec.expContractGas, ctx.GasMeter().GasConsumed()-before-storageCosts)
 			// verify msgs dispatched
 			require.Len(t, *capturedMsgs, len(spec.contractResp.Messages))
@@ -682,7 +681,7 @@ func TestOnTimeoutPacket(t *testing.T) {
 			}
 			require.NoError(t, err)
 			// verify gas consumed
-			const storageCosts = sdk.Gas(0xa9d)
+			const storageCosts = sdk.Gas(0xad9)
 			assert.Equal(t, spec.expContractGas, ctx.GasMeter().GasConsumed()-before-storageCosts)
 			// verify msgs dispatched
 			require.Len(t, *capturedMsgs, len(spec.contractResp.Messages))

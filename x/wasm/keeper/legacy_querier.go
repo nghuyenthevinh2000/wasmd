@@ -2,14 +2,12 @@ package keeper
 
 import (
 	"encoding/json"
-	"reflect"
-	"strconv"
-
+	"github.com/CosmWasm/wasmd/x/wasm/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	abci "github.com/tendermint/tendermint/abci/types"
-
-	"github.com/CosmWasm/wasmd/x/wasm/types"
+	"reflect"
+	"strconv"
 )
 
 const (
@@ -36,15 +34,15 @@ func NewLegacyQuerier(keeper types.ViewKeeper, gasLimit sdk.Gas) sdk.Querier {
 		)
 		switch path[0] {
 		case QueryGetContract:
-			addr, addrErr := sdk.AccAddressFromBech32(path[1])
-			if addrErr != nil {
-				return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, addrErr.Error())
+			addr, err := sdk.AccAddressFromBech32(path[1])
+			if err != nil {
+				return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, err.Error())
 			}
 			rsp, err = queryContractInfo(ctx, addr, keeper)
 		case QueryListContractByCode:
-			codeID, parseErr := strconv.ParseUint(path[1], 10, 64)
-			if parseErr != nil {
-				return nil, sdkerrors.Wrapf(types.ErrInvalid, "code id: %s", parseErr.Error())
+			codeID, err := strconv.ParseUint(path[1], 10, 64)
+			if err != nil {
+				return nil, sdkerrors.Wrapf(types.ErrInvalid, "code id: %s", err.Error())
 			}
 			rsp = queryContractListByCode(ctx, codeID, keeper)
 		case QueryGetContractState:
@@ -53,17 +51,17 @@ func NewLegacyQuerier(keeper types.ViewKeeper, gasLimit sdk.Gas) sdk.Querier {
 			}
 			return queryContractState(ctx, path[1], path[2], req.Data, gasLimit, keeper)
 		case QueryGetCode:
-			codeID, parseErr := strconv.ParseUint(path[1], 10, 64)
-			if parseErr != nil {
-				return nil, sdkerrors.Wrapf(types.ErrInvalid, "code id: %s", parseErr.Error())
+			codeID, err := strconv.ParseUint(path[1], 10, 64)
+			if err != nil {
+				return nil, sdkerrors.Wrapf(types.ErrInvalid, "code id: %s", err.Error())
 			}
 			rsp, err = queryCode(ctx, codeID, keeper)
 		case QueryListCode:
 			rsp, err = queryCodeList(ctx, keeper)
 		case QueryContractHistory:
-			contractAddr, addrErr := sdk.AccAddressFromBech32(path[1])
-			if addrErr != nil {
-				return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, addrErr.Error())
+			contractAddr, err := sdk.AccAddressFromBech32(path[1])
+			if err != nil {
+				return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, err.Error())
 			}
 			rsp, err = queryContractHistory(ctx, contractAddr, keeper)
 		default:
@@ -89,9 +87,9 @@ func queryContractState(ctx sdk.Context, bech, queryMethod string, data []byte, 
 		return nil, sdkerrors.Wrap(sdkerrors.ErrInvalidAddress, bech)
 	}
 
+	var resultData []types.Model
 	switch queryMethod {
 	case QueryMethodContractStateAll:
-		resultData := make([]types.Model, 0)
 		// this returns a serialized json object (which internally encoded binary fields properly)
 		for iter := keeper.GetContractState(ctx, contractAddr); iter.Valid(); iter.Next() {
 			resultData = append(resultData, types.Model{
@@ -99,27 +97,25 @@ func queryContractState(ctx sdk.Context, bech, queryMethod string, data []byte, 
 				Value: iter.Value(),
 			})
 		}
-		bz, err := json.Marshal(resultData)
-		if err != nil {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+		if resultData == nil {
+			resultData = make([]types.Model, 0)
 		}
-		return bz, nil
 	case QueryMethodContractStateRaw:
 		// this returns the raw data from the state, base64-encoded
 		return keeper.QueryRaw(ctx, contractAddr, data), nil
 	case QueryMethodContractStateSmart:
 		// we enforce a subjective gas limit on all queries to avoid infinite loops
 		ctx = ctx.WithGasMeter(sdk.NewGasMeter(gasLimit))
-		msg := types.RawContractMessage(data)
-		if err := msg.ValidateBasic(); err != nil {
-			return nil, sdkerrors.Wrap(err, "json msg")
-		}
 		// this returns raw bytes (must be base64-encoded)
-		bz, err := keeper.QuerySmart(ctx, contractAddr, msg)
-		return bz, err
+		return keeper.QuerySmart(ctx, contractAddr, data)
 	default:
 		return nil, sdkerrors.Wrap(sdkerrors.ErrUnknownRequest, queryMethod)
 	}
+	bz, err := json.Marshal(resultData)
+	if err != nil {
+		return nil, sdkerrors.Wrap(sdkerrors.ErrJSONMarshal, err.Error())
+	}
+	return bz, nil
 }
 
 func queryCodeList(ctx sdk.Context, keeper types.ViewKeeper) ([]types.CodeInfoResponse, error) {
